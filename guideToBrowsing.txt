@@ -1,0 +1,87 @@
+/******************************************************************************
+* Description - Guide for setting up ctags and cscope with vim to browse kernel
+*               source code from user applications.
+* Author      - Debmalya Sarkar
+* Date        - 17th February 2018
+******************************************************************************/
+
+Step 1 : Download the kernel source code and extract it to a directory.
+         Find the absolute path to this directory by the following command.
+         $pwd
+         For representation I will denote the output of this command here as
+         <yourPathToKernelSrc>
+         Users should replace this with their actual path.
+         Eg : In my setup the path is -----> /usr/ksrc/linux-stable/
+
+Step 2 : Download and Install Neccessary Packages
+         $sudo apt-get install exuberant-ctags cscope ---> [For Debian Systems]
+
+Step 3 : Verify the correct installation by running the following commands:
+         $ctags  --version
+         $cscope --version
+         If versions are displayed correctly it is a fairly good indication 
+         that the installation was successful.
+
+Step 4 : Browse to the kernel source directory
+         $cd <yourPathToKernelSrc>
+
+Step 5 : Build the 'tags' file with absolute paths instead of relative paths
+         This file is used by ctags to find and resolve symbols.
+         This command will take some time to complete and will create a 'tags'
+         file in the current directory with a size of few hundred MBs.
+         $ctags --file-scope=no -R *
+         
+Step 6 : Configure vim to add the tags file to its global list so all the
+         sub directories can see it.
+         $echo ":set tags=<yourPathToKernelSrc/tags>" >> ~/.vimrc
+         Eg : In my setup the command resolves into:
+              $echo ":set tags=/usr/ksrc/linux-stable/tags" >> ~/.vimrc
+
+Step 7 : You can verify the above step using the following command:
+         $cat ~/.vimrc
+         You should see that the string we wrote to this file must be present.
+
+Step 8 : Browse to the kernel source directory and run the following command to
+         set up cscope database:
+         $cscope -R
+-------------------------------------------------------------------------------
+
+Note : ctag works from any directory but $cscope -d to open cscope will only 
+       work from the location where the cscope.out file is saved.
+       To make it globally accessible we have to configure .vimrc file.
+-------------------------------------------------------------------------------
+
+Usage --> ctags
+---------------
+1.To go to definition of a symbol(function, variable) select the symbol with 
+  cursor and then press ' CTRL + ]' Keys to jump to symbol definiion
+
+2.To return to calling symbol press 'CTRL + T'
+
+3.To view multiple definitions of a symbol
+  Way 1 - Press 'Escape' to enter Vim Command Mode
+          Press ':ts' and Enter to see list of available symbols.
+          Select the number to jump to that location
+
+  Way 2 - Press 'Escape' to enter Vim Command Mode
+          Press g + ] to see list of definitions
+          Select the number to jump to that location.
+
+4.:tn -> Next and ':tp' --> previous tags also used in real drivers.
+
+Usage --> cscope
+----------------
+TODO
+
+Usage - Browsing Files in Same Directory with Vim
+-------------------------------------------------
+Consider File1, File2, File3 ... FileN in same directory
+1. Open File1 in Vim.
+2. To switch to the File2 from within Vim use command ':e File2' using 
+   TAB completion and press Enter.
+3. To return to the previous file press ':e#'
+
+Note : If nested switches are made then Vim saves this information in a 
+       numbered buffer. 
+       To go to any file 'N' in the buffer use ':e#N'
+
